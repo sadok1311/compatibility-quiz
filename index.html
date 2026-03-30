@@ -3,22 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>compatibility quiz</title>
+    <meta name="description" content="An artistic compatibility quiz inspired by music and emotion.">
+    <title>frequency — compatibility quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        /* ============================================
+           VARIABLES & RESET
+           ============================================ */
+        :root {
+            --color-dark: #0a0a0a;
+            --color-light: #f5f1de;
+            --color-text: #e8e4d8;
+            --color-text-muted: #b8b0a0;
+            --color-accent: #d4a574;
+            --color-accent-warm: #b8956f;
+            --color-glass-light: rgba(245, 241, 222, 0.05);
+            --color-glass-medium: rgba(245, 241, 222, 0.08);
+            --color-glass-dark: rgba(0, 0, 0, 0.4);
+            --transition-smooth: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --transition-fast: all 0.25s ease-out;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Georgia', serif;
-            background: #000;
-            color: #f0f0f0;
-            overflow-x: hidden;
-            position: relative;
+        html {
+            scroll-behavior: smooth;
         }
 
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--color-dark) 0%, #1a1a1a 100%);
+            color: var(--color-text);
+            overflow-x: hidden;
+            position: relative;
+            line-height: 1.6;
+            letter-spacing: 0.3px;
+        }
+
+        /* Ambient background effects */
         body::before {
             content: '';
             position: fixed;
@@ -26,11 +54,13 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, transparent 50%, rgba(0,0,0,0.8) 100%);
+            background: radial-gradient(circle at 20% 50%, rgba(212, 165, 116, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(184, 149, 111, 0.03) 0%, transparent 50%);
             pointer-events: none;
-            z-index: 1;
+            z-index: 0;
         }
 
+        /* Grain texture overlay */
         body::after {
             content: '';
             position: fixed;
@@ -38,110 +68,250 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48ZmlsdGVyIGlkPSJub2lzZSI+PGZlVHVyYnVsZW5jZSBiYXNlRnJlcXVlbmN5PSIwLjkiIG51bU9IjQiIHR5cGU9ImZyYWN0YWxOb2lzZSIvPjwvZmlsdGVyPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBvcGFjaXR5PSIwLjA1Ii8+PC9zdmc+');
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48ZmlsdGVyIGlkPSJub2lzZSI+PGZlVHVyYnVsZW5jZSBiYXNlRnJlcXVlbmN5PSIwLjkiIG51bU9jdGF2ZXM9IjQiIHR5cGU9ImZyYWN0YWxOb2lzZSIgc2VlZD0iMiIvPjwvZmlsdGVyPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBvcGFjaXR5PSIwLjAzIi8+PC9zdmc+');
             pointer-events: none;
-            z-index: 1;
+            z-index: 0;
+        }
+
+        /* ============================================
+           LAYOUT & STRUCTURE
+           ============================================ */
+        main {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            width: 100%;
         }
 
         .container {
-            position: relative;
-            z-index: 2;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 2rem;
             text-align: center;
         }
 
-        .progress-bar {
+        /* Header with music player */
+        header {
             position: fixed;
             top: 0;
             left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            backdrop-filter: blur(10px);
+            background: rgba(10, 10, 10, 0.4);
+            border-bottom: 1px solid rgba(212, 165, 116, 0.1);
+        }
+
+        .header-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            letter-spacing: 3px;
+            color: var(--color-accent);
+            text-transform: uppercase;
+            font-weight: 400;
+        }
+
+        /* ============================================
+           PROGRESS BAR
+           ============================================ */
+        .progress-container {
+            position: fixed;
+            top: 80px;
+            left: 0;
             width: 100%;
-            height: 4px;
-            background: #333;
-            z-index: 10;
+            height: 3px;
+            background: var(--color-glass-medium);
+            z-index: 50;
+            border-bottom: 1px solid rgba(212, 165, 116, 0.1);
         }
 
         .progress-fill {
             height: 100%;
-            background: #f0f0f0;
-            transition: width 0.5s ease;
+            background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent-warm) 100%);
+            transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 0 20px rgba(212, 165, 116, 0.6);
         }
 
+        /* ============================================
+           SECTIONS & QUIZ CARDS
+           ============================================ */
         .section {
             display: none;
             opacity: 0;
-            transition: opacity 1s ease;
+            animation: fadeInUp 0.8s ease-out forwards;
+            animation-delay: 0.2s;
         }
 
         .section.active {
-            display: block;
-            opacity: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2.5rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Section chapter indicator */
+        .section-number {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--color-accent);
+            margin-bottom: 1rem;
+            opacity: 0.7;
         }
 
         .title {
-            font-size: 2rem;
-            margin-bottom: 20px;
-            font-weight: normal;
-        }
-
-        .prompt {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            line-height: 1.4;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 400;
+            color: var(--color-light);
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+            line-height: 1.2;
         }
 
         .quote {
             font-style: italic;
-            margin-bottom: 20px;
             font-size: 1.1rem;
+            color: var(--color-accent);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+
+        .prompt {
+            font-size: 1.15rem;
+            color: var(--color-text);
+            margin-bottom: 2.5rem;
+            max-width: 650px;
+            line-height: 1.7;
+            opacity: 0.95;
         }
 
         .helper {
-            font-size: 0.9rem;
-            color: #ccc;
-            margin-bottom: 20px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--color-text-muted);
+            margin-top: -1.5rem;
+            margin-bottom: 2rem;
         }
 
+        /* ============================================
+           OPTIONS / ANSWER CARDS
+           ============================================ */
         .options {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            max-width: 400px;
+            gap: 1.2rem;
+            max-width: 520px;
             width: 100%;
         }
 
         .option {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 15px;
-            border-radius: 8px;
+            background: var(--color-glass-light);
+            border: 1px solid rgba(212, 165, 116, 0.2);
+            padding: 1.5rem;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Arial', sans-serif;
+            transition: var(--transition-smooth);
             font-size: 1rem;
             text-align: left;
+            color: var(--color-text);
+            backdrop-filter: blur(8px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 165, 116, 0.1), transparent);
+            transition: left 0.6s ease;
         }
 
         .option:hover {
-            background: rgba(255,255,255,0.1);
-            transform: translateY(-2px);
+            background: var(--color-glass-medium);
+            border-color: rgba(212, 165, 116, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(212, 165, 116, 0.15);
+        }
+
+        .option:hover::before {
+            left: 100%;
         }
 
         .option.selected {
-            background: rgba(255,255,255,0.15);
-            border-color: #f0f0f0;
+            background: rgba(212, 165, 116, 0.15);
+            border-color: var(--color-accent);
+            box-shadow: 0 8px 24px rgba(212, 165, 116, 0.25);
         }
 
-        .music-wave {
-            margin: 20px 0;
-            font-size: 1.5rem;
-            opacity: 0.5;
+        .option.selected::after {
+            content: '✓';
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-accent);
+            font-weight: 600;
+            font-size: 1.2rem;
         }
 
+        /* Music-inspired waveform divider */
+        .waveform {
+            margin: 3rem 0 2rem;
+            padding: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .waveform-bar {
+            width: 3px;
+            height: 20px;
+            background: linear-gradient(180deg, transparent, var(--color-accent), transparent);
+            border-radius: 2px;
+            animation: wave 2s ease-in-out infinite;
+        }
+
+        .waveform-bar:nth-child(1) { animation-delay: 0s; }
+        .waveform-bar:nth-child(2) { animation-delay: 0.1s; }
+        .waveform-bar:nth-child(3) { animation-delay: 0.2s; height: 35px; }
+        .waveform-bar:nth-child(4) { animation-delay: 0.1s; }
+        .waveform-bar:nth-child(5) { animation-delay: 0s; }
+
+        @keyframes wave {
+            0%, 100% { height: 15px; opacity: 0.6; }
+            50% { height: 40px; opacity: 1; }
+        }
+
+        /* ============================================
+           MODAL / RESULT SCREEN
+           ============================================ */
         .modal {
             display: none;
             position: fixed;
@@ -149,296 +319,677 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 20;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(12px);
+            z-index: 200;
             justify-content: center;
             align-items: center;
+            padding: 2rem;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.active {
+            display: flex;
         }
 
         .modal-content {
-            background: #111;
-            padding: 40px;
-            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.8) 0%, rgba(25, 25, 25, 0.6) 100%);
+            border: 1px solid rgba(212, 165, 116, 0.2);
+            padding: 3rem 2rem;
+            border-radius: 16px;
             text-align: center;
-            max-width: 300px;
-            width: 90%;
-            border: 1px solid rgba(255,255,255,0.1);
+            max-width: 420px;
+            width: 100%;
+            backdrop-filter: blur(20px);
+            animation: slideInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
         }
 
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(60px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Glow effect for match result */
         .modal.match .modal-content {
-            box-shadow: 0 0 20px rgba(240,240,240,0.3);
+            border-color: rgba(212, 165, 116, 0.6);
+            box-shadow: 0 0 60px rgba(212, 165, 116, 0.4),
+                        inset 0 0 60px rgba(212, 165, 116, 0.08);
         }
 
         .modal-title {
-            font-size: 2rem;
-            margin-bottom: 10px;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 6vw, 2.8rem);
+            margin-bottom: 1rem;
+            color: var(--color-light);
+            font-weight: 400;
+            letter-spacing: -1px;
         }
 
         .modal-subtitle {
             font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: #ccc;
+            margin-bottom: 1.5rem;
+            color: var(--color-accent);
+            font-style: italic;
+            opacity: 0.9;
         }
 
         .modal-text {
-            font-size: 0.9rem;
-            color: #aaa;
-            margin-bottom: 30px;
+            font-size: 0.95rem;
+            color: var(--color-text-muted);
+            margin-bottom: 2.5rem;
+            line-height: 1.8;
         }
 
         .restart-btn {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 10px 20px;
-            border-radius: 5px;
+            background: linear-gradient(135deg, rgba(212, 165, 116, 0.2) 0%, rgba(184, 149, 111, 0.15) 100%);
+            border: 1px solid var(--color-accent);
+            padding: 1rem 2.5rem;
+            border-radius: 8px;
             cursor: pointer;
-            font-family: 'Arial', sans-serif;
-            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--color-accent);
+            transition: var(--transition-smooth);
+            font-weight: 600;
         }
 
         .restart-btn:hover {
-            background: rgba(255,255,255,0.2);
+            background: linear-gradient(135deg, rgba(212, 165, 116, 0.3) 0%, rgba(184, 149, 111, 0.25) 100%);
+            box-shadow: 0 8px 24px rgba(212, 165, 116, 0.3);
+            transform: translateY(-2px);
         }
 
-        @media (max-width: 600px) {
-            .title {
-                font-size: 1.5rem;
+        /* ============================================
+           MUSIC PLAYER
+           ============================================ */
+        .music-player {
+            position: fixed;
+            top: 1.5rem;
+            right: 2rem;
+            z-index: 150;
+        }
+
+        .music-toggle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(212, 165, 116, 0.15) 0%, rgba(184, 149, 111, 0.1) 100%);
+            border: 1.5px solid rgba(212, 165, 116, 0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+            color: var(--color-accent);
+            font-size: 1.2rem;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .music-toggle:hover {
+            background: linear-gradient(135deg, rgba(212, 165, 116, 0.25) 0%, rgba(184, 149, 111, 0.18) 100%);
+            border-color: rgba(212, 165, 116, 0.6);
+            transform: scale(1.05);
+        }
+
+        .music-toggle.playing {
+            background: linear-gradient(135deg, rgba(212, 165, 116, 0.25) 0%, rgba(184, 149, 111, 0.18) 100%);
+            border-color: var(--color-accent);
+        }
+
+        /* Visualizer dots when playing */
+        .visualizer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            opacity: 0;
+        }
+
+        .visualizer.active {
+            opacity: 1;
+        }
+
+        .visualizer-dot {
+            width: 2px;
+            height: 8px;
+            background: var(--color-accent);
+            border-radius: 1px;
+            animation: pulse 0.8s ease-in-out infinite;
+        }
+
+        .visualizer-dot:nth-child(1) { animation-delay: 0s; }
+        .visualizer-dot:nth-child(2) { animation-delay: 0.1s; }
+        .visualizer-dot:nth-child(3) { animation-delay: 0.2s; }
+
+        @keyframes pulse {
+            0%, 100% { height: 4px; opacity: 0.4; }
+            50% { height: 12px; opacity: 1; }
+        }
+
+        audio {
+            display: none;
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN
+           ============================================ */
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem 1.5rem;
+                gap: 1rem;
             }
+
+            .header-logo {
+                font-size: 0.85rem;
+                letter-spacing: 2px;
+            }
+
+            .progress-container {
+                top: 60px;
+            }
+
+            .container {
+                padding: 9rem 1. 5rem 4rem;
+                margin-top: 60px;
+            }
+
+            .title {
+                font-size: clamp(1.4rem, 4vw, 2rem);
+            }
+
             .prompt {
                 font-size: 1rem;
             }
+
             .option {
-                padding: 12px;
+                padding: 1.2rem;
+                font-size: 0.95rem;
+            }
+
+            .options {
+                max-width: 95vw;
+                gap: 1rem;
+            }
+
+            .modal-content {
+                padding: 2.5rem 1.5rem;
+                max-width: 90vw;
+            }
+
+            .modal-title {
+                font-size: 2rem;
+            }
+
+            .music-player {
+                right: 1.5rem;
+            }
+
+            .music-toggle {
+                width: 44px;
+                height: 44px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 8rem 1rem 2rem;
+            }
+
+            .title {
+                font-size: 1.3rem;
+            }
+
+            .prompt {
+                font-size: 0.95rem;
+            }
+
+            .option {
+                padding: 1rem;
                 font-size: 0.9rem;
+            }
+
+            .modal-content {
+                padding: 2rem 1rem;
+            }
+
+            .restart-btn {
+                padding: 0.9rem 2rem;
+                font-size: 0.85rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="progress-bar">
+    <!-- Header & Music Player -->
+    <header>
+        <div class="header-logo">frequency</div>
+        <div class="music-player">
+            <button class="music-toggle" id="music-toggle" title="Toggle background music" aria-label="Toggle music player">
+                <span id="music-icon">♪</span>
+                <div class="visualizer" id="visualizer">
+                    <div class="visualizer-dot"></div>
+                    <div class="visualizer-dot"></div>
+                    <div class="visualizer-dot"></div>
+                </div>
+            </button>
+            <audio id="audio-player" loop>
+                <source src="assets/doomsday.mp3" type="audio/mpeg">
+                <!-- Fallback: You can provide alternative audio format here -->
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
         <div class="progress-fill" id="progress-fill"></div>
     </div>
 
-    <div class="container">
-        <!-- Section 1 -->
-        <div class="section active" id="section1">
-            <div class="title">complete the sentence</div>
-            <div class="prompt">human consciousness is a ________.</div>
-            <div class="options">
-                <div class="option" data-answer="tragic misstep">tragic misstep</div>
-                <div class="option" data-answer="gift without consequence">gift without consequence</div>
-                <div class="option" data-answer="simple biological progress">simple biological progress</div>
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            
+            <!-- Section 1: Consciousness -->
+            <div class="section active" id="section1">
+                <div class="section-number">01 — Consciousness</div>
+                <h1 class="title">complete the sentence</h1>
+                <p class="prompt">human consciousness is a ________.</p>
+                <div class="options" id="options1">
+                    <div class="option" data-answer="tragic misstep">tragic misstep</div>
+                    <div class="option" data-answer="gift without consequence">gift without consequence</div>
+                    <div class="option" data-answer="simple biological progress">simple biological progress</div>
+                </div>
+                <p class="helper">choose the ending that feels most true</p>
             </div>
-            <div class="helper">choose the ending that feels most true</div>
-        </div>
 
-        <!-- Section 2 -->
-        <div class="section" id="section2">
-            <div class="title">describe this idea</div>
-            <div class="quote">"we are born in fear, live in fear, and die in fear."</div>
-            <div class="prompt">what feels closest to what this means?</div>
-            <div class="options">
-                <div class="option" data-answer="fear-control">fear is one of the deepest tools of control: fear of hell, fear of authority, fear of exclusion, fear of consequence. it shapes what we do and what we silence.</div>
-                <div class="option" data-answer="fear-weakness">fear is mostly an individual weakness and disappears if people simply think positively.</div>
-                <div class="option" data-answer="fear-natural">fear is natural, but it has little to do with power, obedience, or social control.</div>
+            <!-- Section 2: Fear -->
+            <div class="section" id="section2">
+                <div class="section-number">02 — Fear</div>
+                <h1 class="title">describe this idea</h1>
+                <p class="quote">"we are born in fear, live in fear, and die in fear."</p>
+                <p class="prompt">what feels closest to what this means?</p>
+                <div class="options" id="options2">
+                    <div class="option" data-answer="fear-control">fear is one of the deepest tools of control: fear of hell, fear of authority, fear of exclusion, fear of consequence. it shapes what we do and what we silence.</div>
+                    <div class="option" data-answer="fear-weakness">fear is mostly an individual weakness and disappears if people simply think positively.</div>
+                    <div class="option" data-answer="fear-natural">fear is natural, but it has little to do with power, obedience, or social control.</div>
+                </div>
             </div>
-        </div>
 
-        <!-- Section 3 -->
-        <div class="section" id="section3">
-            <div class="title">belief</div>
-            <div class="prompt">how do you describe your relationship with belief?</div>
-            <div class="options">
-                <div class="option" data-answer="question-doubt">i question, doubt, learn, and stay open to complexity.</div>
-                <div class="option" data-answer="accept-inherited">i accept inherited truths without questioning them.</div>
-                <div class="option" data-answer="reject-everything">i reject everything automatically and don't care to understand anything deeply.</div>
+            <!-- Section 3: Belief -->
+            <div class="section" id="section3">
+                <div class="section-number">03 — Belief</div>
+                <h1 class="title">belief</h1>
+                <p class="prompt">how do you describe your relationship with belief?</p>
+                <div class="options" id="options3">
+                    <div class="option" data-answer="question-doubt">i question, doubt, learn, and stay open to complexity.</div>
+                    <div class="option" data-answer="accept-inherited">i accept inherited truths without questioning them.</div>
+                    <div class="option" data-answer="reject-everything">i reject everything automatically and don't care to understand anything deeply.</div>
+                </div>
             </div>
-        </div>
 
-        <!-- Section 4 -->
-        <div class="section" id="section4">
-            <div class="title">which voice stays with you more?</div>
-            <div class="prompt">choose the writer whose way of seeing the world feels closer to yours.</div>
-            <div class="options">
-                <div class="option" data-answer="nawal">nawal el saadawi</div>
-                <div class="option" data-answer="jordan">jordan peterson</div>
+            <!-- Section 4: Writers -->
+            <div class="section" id="section4">
+                <div class="section-number">04 — Voice</div>
+                <h1 class="title">which voice stays with you more?</h1>
+                <p class="prompt">choose the writer whose way of seeing the world feels closer to yours.</p>
+                <div class="options" id="options4">
+                    <div class="option" data-answer="nawal">nawal el saadawi</div>
+                    <div class="option" data-answer="jordan">jordan peterson</div>
+                </div>
             </div>
-        </div>
 
-        <!-- Section 5 -->
-        <div class="section" id="section5">
-            <div class="title">symbolic instinct</div>
-            <div class="prompt">which political figure feels closer to your instinct?</div>
-            <div class="options">
-                <div class="option" data-answer="che">che guevara</div>
-                <div class="option" data-answer="fidel">fidel castro</div>
-                <div class="option" data-answer="reject">i reject revolutionary politics entirely</div>
+            <!-- Section 5: Politics -->
+            <div class="section" id="section5">
+                <div class="section-number">05 — Politics</div>
+                <h1 class="title">symbolic instinct</h1>
+                <p class="prompt">which political figure feels closer to your instinct?</p>
+                <div class="options" id="options5">
+                    <div class="option" data-answer="che">che guevara</div>
+                    <div class="option" data-answer="fidel">fidel castro</div>
+                    <div class="option" data-answer="reject">i reject revolutionary politics entirely</div>
+                </div>
             </div>
-        </div>
 
-        <!-- Section 6 -->
-        <div class="section" id="section6">
-            <div class="title">frequency</div>
-            <div class="helper">sometimes taste says more than explanation.</div>
-            <div class="prompt">what kind of music connection feels more real to you?</div>
-            <div class="options" id="music-options1">
-                <div class="option" data-answer="introspective">music that sounds like a late-night drive, introspection, and emotional tension</div>
-                <div class="option" data-answer="catchy">music that is catchy but says nothing beyond the moment</div>
-                <div class="option" data-answer="nothing">i don't think music says much about a person</div>
-            </div>
-            <div class="prompt" style="margin-top: 30px;">pick the line that feels most like your taste.</div>
-            <div class="options" id="music-options2">
-                <div class="option" data-answer="psychedelic">psychedelic, intimate, reflective, slightly lost but beautiful</div>
-                <div class="option" data-answer="loud">loud, disposable, random, just for background noise</div>
-                <div class="option" data-answer="silence">i don't care much about atmosphere or sonic identity</div>
-            </div>
-            <div class="prompt" style="margin-top: 30px;">choose the shared vibe that feels closest.</div>
-            <div class="options" id="music-options3">
-                <div class="option" data-answer="tame">tame impala, depth, texture, inner worlds</div>
-                <div class="option" data-answer="trending">whatever is trending, no attachment</div>
-                <div class="option" data-answer="silence">silence over music, always</div>
-            </div>
-            <div class="music-wave">〜〜〜</div>
-        </div>
-    </div>
+            <!-- Section 6: Music -->
+            <div class="section" id="section6">
+                <div class="section-number">06 — Frequency</div>
+                <h1 class="title">frequency</h1>
+                <p class="helper">sometimes taste says more than explanation.</p>
+                
+                <div class="music-section" data-music-question="1">
+                    <p class="prompt">what kind of music connection feels more real to you?</p>
+                    <div class="options" id="music-options1">
+                        <div class="option" data-answer="introspective">music that sounds like a late-night drive, introspection, and emotional tension</div>
+                        <div class="option" data-answer="catchy">music that is catchy but says nothing beyond the moment</div>
+                        <div class="option" data-answer="nothing">i don't think music says much about a person</div>
+                    </div>
+                </div>
 
+                <div class="music-section" data-music-question="2" style="display: none;">
+                    <p class="prompt">pick the line that feels most like your taste.</p>
+                    <div class="options" id="music-options2">
+                        <div class="option" data-answer="psychedelic">psychedelic, intimate, reflective, slightly lost but beautiful</div>
+                        <div class="option" data-answer="loud">loud, disposable, random, just for background noise</div>
+                        <div class="option" data-answer="silence">i don't care much about atmosphere or sonic identity</div>
+                    </div>
+                </div>
+
+                <div class="music-section" data-music-question="3" style="display: none;">
+                    <p class="prompt">choose the shared vibe that feels closest.</p>
+                    <div class="options" id="music-options3">
+                        <div class="option" data-answer="tame">tame impala, depth, texture, inner worlds</div>
+                        <div class="option" data-answer="trending">whatever is trending, no attachment</div>
+                        <div class="option" data-answer="silence">silence over music, always</div>
+                    </div>
+                </div>
+
+                <div class="waveform">
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                    <div class="waveform-bar"></div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Result Modal -->
     <div class="modal" id="result-modal">
         <div class="modal-content">
-            <div class="modal-title" id="modal-title"></div>
-            <div class="modal-subtitle" id="modal-subtitle"></div>
-            <div class="modal-text" id="modal-text"></div>
-            <button class="restart-btn" onclick="restartQuiz()">start over</button>
+            <h2 class="modal-title" id="modal-title"></h2>
+            <p class="modal-subtitle" id="modal-subtitle"></p>
+            <p class="modal-text" id="modal-text"></p>
+            <button class="restart-btn" onclick="quizController.restart()">start over</button>
         </div>
     </div>
 
+    <!-- JavaScript -->
     <script>
-        let currentSection = 1;
-        let answers = [];
-        let musicAnswers = [];
+        /* ============================================
+           QUIZ LOGIC & STATE MANAGEMENT
+           ============================================ */
+        const quizController = {
+            currentSection: 1,
+            answers: [],
+            musicAnswers: [],
+            currentMusicQuestion: 1,
+            
+            alignedAnswers: {
+                1: 'tragic misstep',
+                2: 'fear-control',
+                3: 'question-doubt',
+                4: 'nawal',
+                5: ['che', 'fidel'],
+                6: ['introspective', 'psychedelic', 'tame']
+            },
 
-        const sections = document.querySelectorAll('.section');
-        const progressFill = document.getElementById('progress-fill');
-        const modal = document.getElementById('result-modal');
-        const modalTitle = document.getElementById('modal-title');
-        const modalSubtitle = document.getElementById('modal-subtitle');
-        const modalText = document.getElementById('modal-text');
+            init() {
+                this.setupEventListeners();
+                this.updateProgress();
+                console.log('Quiz initialized');
+            },
 
-        const alignedAnswers = {
-            1: 'tragic misstep',
-            2: 'fear-control',
-            3: 'question-doubt',
-            4: 'nawal',
-            5: ['che', 'fidel'],
-            6: ['introspective', 'psychedelic', 'tame']
-        };
-
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('option')) {
-                selectOption(e.target);
-            }
-        });
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key >= '1' && e.key <= '3') {
-                const options = document.querySelectorAll('.section.active .option');
-                if (options[e.key - 1]) {
-                    selectOption(options[e.key - 1]);
-                }
-            }
-        });
-
-        function selectOption(option) {
-            const section = option.closest('.section');
-            const options = section.querySelectorAll('.option');
-            options.forEach(opt => opt.classList.remove('selected'));
-            option.classList.add('selected');
-
-            const answer = option.dataset.answer;
-            if (currentSection === 6) {
-                musicAnswers.push(answer);
-                const musicOptions = section.querySelectorAll('.options');
-                let currentMusicSection = 0;
-                musicOptions.forEach((optGroup, index) => {
-                    if (optGroup.contains(option)) {
-                        currentMusicSection = index;
+            setupEventListeners() {
+                // Single click handler for all options
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('option')) {
+                        this.handleOptionClick(e.target);
                     }
                 });
-                if (currentMusicSection < 2) {
-                    setTimeout(() => {
-                        musicOptions[currentMusicSection].style.display = 'none';
-                        musicOptions[currentMusicSection + 1].style.display = 'flex';
-                    }, 500);
-                    return;
+
+                // Keyboard support
+                document.addEventListener('keydown', (e) => {
+                    if (e.key >= '1' && e.key <= '3') {
+                        const options = document.querySelectorAll('.section.active .option');
+                        if (options[e.key - 1]) {
+                            this.handleOptionClick(options[e.key - 1]);
+                        }
+                    }
+                });
+            },
+
+            handleOptionClick(element) {
+                const section = element.closest('.section');
+                const options = section.querySelectorAll('.option');
+                
+                // Remove previous selection
+                options.forEach(opt => opt.classList.remove('selected'));
+                
+                // Add selection to current
+                element.classList.add('selected');
+                
+                const answer = element.dataset.answer;
+                
+                // Handle music section (6) specially
+                if (this.currentSection === 6) {
+                    this.musicAnswers.push(answer);
+                    this.currentMusicQuestion++;
+                    
+                    // Show next music question if available
+                    const musicSections = section.querySelectorAll('.music-section');
+                    if (this.currentMusicQuestion <= musicSections.length) {
+                        setTimeout(() => {
+                            musicSections.forEach(s => s.style.display = 'none');
+                            musicSections[this.currentMusicQuestion - 1].style.display = 'block';
+                            // Remove selections for next question
+                            section.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+                        }, 600);
+                        return;
+                    } else {
+                        // Music section complete
+                        this.answers.push(this.musicAnswers);
+                    }
                 } else {
-                    answers.push(musicAnswers);
+                    this.answers.push(answer);
                 }
-            } else {
-                answers.push(answer);
-            }
+                
+                // Move to next section
+                setTimeout(() => this.nextSection(), 900);
+            },
 
-            setTimeout(() => {
-                nextSection();
-            }, 1000);
-        }
-
-        function nextSection() {
-            sections[currentSection - 1].classList.remove('active');
-            currentSection++;
-            if (currentSection <= 6) {
-                sections[currentSection - 1].classList.add('active');
-                updateProgress();
-            } else {
-                calculateResult();
-            }
-        }
-
-        function updateProgress() {
-            const progress = (currentSection - 1) / 6 * 100;
-            progressFill.style.width = progress + '%';
-        }
-
-        function calculateResult() {
-            let score = 0;
-            answers.forEach((answer, index) => {
-                const section = index + 1;
-                if (section === 6) {
-                    // Music scoring
-                    const alignedCount = answer.filter(ans => alignedAnswers[6].includes(ans)).length;
-                    if (alignedCount >= 2) score++;
-                } else if (Array.isArray(alignedAnswers[section])) {
-                    if (alignedAnswers[section].includes(answer)) score++;
+            nextSection() {
+                const sections = document.querySelectorAll('.section');
+                sections[this.currentSection - 1].classList.remove('active');
+                
+                this.currentSection++;
+                
+                if (this.currentSection <= 6) {
+                    sections[this.currentSection - 1].classList.add('active');
+                    this.updateProgress();
+                    // Reset music questions if entering music section
+                    if (this.currentSection === 6) {
+                        this.currentMusicQuestion = 1;
+                    }
                 } else {
-                    if (answer === alignedAnswers[section]) score++;
+                    this.calculateAndShowResult();
                 }
-            });
+            },
 
-            modal.classList.add(score >= 4 ? 'match' : '');
-            if (score >= 4) {
-                modalTitle.textContent = "it's a match";
-                modalSubtitle.textContent = "same frequency, different echoes.";
-                modalText.textContent = "late-night conversations approved.";
-            } else {
-                modalTitle.textContent = "interesting mind";
-                modalSubtitle.textContent = "not the same route, but still a road.";
-                modalText.textContent = "some distances are also a kind of meaning.";
+            updateProgress() {
+                const progress = ((this.currentSection - 1) / 6) * 100;
+                document.getElementById('progress-fill').style.width = progress + '%';
+            },
+
+            calculateAndShowResult() {
+                let score = 0;
+                
+                this.answers.forEach((answer, index) => {
+                    const sectionNum = index + 1;
+                    
+                    if (sectionNum === 6) {
+                        // Music section: count aligned answers (need 2+ out of 3)
+                        const alignedCount = answer.filter(ans => 
+                            this.alignedAnswers[6].includes(ans)
+                        ).length;
+                        if (alignedCount >= 2) score++;
+                    } else if (Array.isArray(this.alignedAnswers[sectionNum])) {
+                        // Multiple valid answers
+                        if (this.alignedAnswers[sectionNum].includes(answer)) score++;
+                    } else {
+                        // Single answer
+                        if (answer === this.alignedAnswers[sectionNum]) score++;
+                    }
+                });
+                
+                this.showResult(score);
+            },
+
+            showResult(score) {
+                const modal = document.getElementById('result-modal');
+                const titleEl = document.getElementById('modal-title');
+                const subtitleEl = document.getElementById('modal-subtitle');
+                const textEl = document.getElementById('modal-text');
+                
+                const isMatch = score >= 4;
+                
+                if (isMatch) {
+                    modal.classList.add('match');
+                    titleEl.textContent = "it's a match";
+                    subtitleEl.textContent = "same frequency, different echoes.";
+                    textEl.textContent = "late-night conversations approved.";
+                } else {
+                    modal.classList.remove('match');
+                    titleEl.textContent = "interesting mind";
+                    subtitleEl.textContent = "not the same route, but still a road.";
+                    textEl.textContent = "some distances are also a kind of meaning.";
+                }
+                
+                modal.classList.add('active');
+                console.log(`Quiz complete. Score: ${score}/6`);
+            },
+
+            restart() {
+                this.currentSection = 1;
+                this.answers = [];
+                this.musicAnswers = [];
+                this.currentMusicQuestion = 1;
+                
+                const sections = document.querySelectorAll('.section');
+                sections.forEach(section => section.classList.remove('active'));
+                sections[0].classList.add('active');
+                
+                // Reset all options
+                document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+                
+                // Reset music section visibility
+                document.querySelectorAll('.music-section').forEach((section, index) => {
+                    section.style.display = index === 0 ? 'block' : 'none';
+                });
+                
+                document.getElementById('result-modal').classList.remove('active', 'match');
+                this.updateProgress();
+                console.log('Quiz restarted');
             }
-            modal.style.display = 'flex';
-        }
+        };
 
-        function restartQuiz() {
-            currentSection = 1;
-            answers = [];
-            musicAnswers = [];
-            sections.forEach(section => section.classList.remove('active'));
-            sections[0].classList.add('active');
-            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
-            document.querySelectorAll('.options').forEach(opt => opt.style.display = 'flex');
-            progressFill.style.width = '0%';
-            modal.style.display = 'none';
-            modal.classList.remove('match');
-        }
+        /* ============================================
+           MUSIC PLAYER LOGIC
+           ============================================ */
+        const musicPlayer = {
+            audioEl: document.getElementById('audio-player'),
+            toggleBtn: document.getElementById('music-toggle'),
+            musicIcon: document.getElementById('music-icon'),
+            visualizer: document.getElementById('visualizer'),
+            isPlaying: false,
 
-        updateProgress();
+            init() {
+                this.setupEventListeners();
+                this.attemptAutoplay();
+                console.log('Music player initialized');
+            },
+
+            setupEventListeners() {
+                this.toggleBtn.addEventListener('click', () => this.toggle());
+                
+                this.audioEl.addEventListener('play', () => this.onPlay());
+                this.audioEl.addEventListener('pause', () => this.onPause());
+                this.audioEl.addEventListener('ended', () => this.onEnded());
+            },
+
+            attemptAutoplay() {
+                // Try to autoplay; if blocked, user must click to start
+                const playPromise = this.audioEl.play();
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => {
+                            this.isPlaying = true;
+                            this.updateUI();
+                        })
+                        .catch(() => {
+                            // Autoplay blocked - user will click to start
+                            console.log('Autoplay blocked by browser');
+                        });
+                }
+            },
+
+            toggle() {
+                if (this.isPlaying) {
+                    this.audioEl.pause();
+                } else {
+                    this.audioEl.play();
+                }
+            },
+
+            onPlay() {
+                this.isPlaying = true;
+                this.updateUI();
+            },
+
+            onPause() {
+                this.isPlaying = false;
+                this.updateUI();
+            },
+
+            onEnded() {
+                // Audio will loop, but reset visualizer if needed
+                this.isPlaying = true;
+                this.updateUI();
+            },
+
+            updateUI() {
+                this.toggleBtn.classList.toggle('playing', this.isPlaying);
+                this.visualizer.classList.toggle('active', this.isPlaying);
+                
+                if (this.isPlaying) {
+                    this.musicIcon.style.display = 'none';
+                    this.toggleBtn.setAttribute('title', 'Music playing - Click to pause');
+                } else {
+                    this.musicIcon.style.display = 'inline';
+                    this.visualizer.classList.remove('active');
+                    this.toggleBtn.setAttribute('title', 'Click to play music');
+                }
+            }
+        };
+
+        /* ============================================
+           INITIALIZATION ON DOM LOAD
+           ============================================ */
+        document.addEventListener('DOMContentLoaded', () => {
+            quizController.init();
+            musicPlayer.init();
+            console.log('Application loaded');
+        });
     </script>
 </body>
 </html>
