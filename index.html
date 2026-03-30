@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>compatibility quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: #000;
+            color: #f0f0f0;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 50%, rgba(0,0,0,0.8) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48ZmlsdGVyIGlkPSJub2lzZSI+PGZlVHVyYnVsZW5jZSBiYXNlRnJlcXVlbmN5PSIwLjkiIG51bU9IjQiIHR5cGU9ImZyYWN0YWxOb2lzZSIvPjwvZmlsdGVyPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBvcGFjaXR5PSIwLjA1Ii8+PC9zdmc+');
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: #333;
+            z-index: 10;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #f0f0f0;
+            transition: width 0.5s ease;
+        }
+
+        .section {
+            display: none;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .section.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+
+        .prompt {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .quote {
+            font-style: italic;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .helper {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .option {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Arial', sans-serif;
+            font-size: 1rem;
+            text-align: left;
+        }
+
+        .option:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .option.selected {
+            background: rgba(255,255,255,0.15);
+            border-color: #f0f0f0;
+        }
+
+        .music-wave {
+            margin: 20px 0;
+            font-size: 1.5rem;
+            opacity: 0.5;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 20;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #111;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 300px;
+            width: 90%;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal.match .modal-content {
+            box-shadow: 0 0 20px rgba(240,240,240,0.3);
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .modal-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+
+        .modal-text {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .restart-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Arial', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        @media (max-width: 600px) {
+            .title {
+                font-size: 1.5rem;
+            }
+            .prompt {
+                font-size: 1rem;
+            }
+            .option {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+    </div>
+
+    <div class="container">
+        <!-- Section 1 -->
+        <div class="section active" id="section1">
+            <div class="title">complete the sentence</div>
+            <div class="prompt">human consciousness is a ________.</div>
+            <div class="options">
+                <div class="option" data-answer="tragic misstep">tragic misstep</div>
+                <div class="option" data-answer="gift without consequence">gift without consequence</div>
+                <div class="option" data-answer="simple biological progress">simple biological progress</div>
+            </div>
+            <div class="helper">choose the ending that feels most true</div>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="section" id="section2">
+            <div class="title">describe this idea</div>
+            <div class="quote">"we are born in fear, live in fear, and die in fear."</div>
+            <div class="prompt">what feels closest to what this means?</div>
+            <div class="options">
+                <div class="option" data-answer="fear-control">fear is one of the deepest tools of control: fear of hell, fear of authority, fear of exclusion, fear of consequence. it shapes what we do and what we silence.</div>
+                <div class="option" data-answer="fear-weakness">fear is mostly an individual weakness and disappears if people simply think positively.</div>
+                <div class="option" data-answer="fear-natural">fear is natural, but it has little to do with power, obedience, or social control.</div>
+            </div>
+        </div>
+
+        <!-- Section 3 -->
+        <div class="section" id="section3">
+            <div class="title">belief</div>
+            <div class="prompt">how do you describe your relationship with belief?</div>
+            <div class="options">
+                <div class="option" data-answer="question-doubt">i question, doubt, learn, and stay open to complexity.</div>
+                <div class="option" data-answer="accept-inherited">i accept inherited truths without questioning them.</div>
+                <div class="option" data-answer="reject-everything">i reject everything automatically and don't care to understand anything deeply.</div>
+            </div>
+        </div>
+
+        <!-- Section 4 -->
+        <div class="section" id="section4">
+            <div class="title">which voice stays with you more?</div>
+            <div class="prompt">choose the writer whose way of seeing the world feels closer to yours.</div>
+            <div class="options">
+                <div class="option" data-answer="nawal">nawal el saadawi</div>
+                <div class="option" data-answer="jordan">jordan peterson</div>
+            </div>
+        </div>
+
+        <!-- Section 5 -->
+        <div class="section" id="section5">
+            <div class="title">symbolic instinct</div>
+            <div class="prompt">which political figure feels closer to your instinct?</div>
+            <div class="options">
+                <div class="option" data-answer="che">che guevara</div>
+                <div class="option" data-answer="fidel">fidel castro</div>
+                <div class="option" data-answer="reject">i reject revolutionary politics entirely</div>
+            </div>
+        </div>
+
+        <!-- Section 6 -->
+        <div class="section" id="section6">
+            <div class="title">frequency</div>
+            <div class="helper">sometimes taste says more than explanation.</div>
+            <div class="prompt">what kind of music connection feels more real to you?</div>
+            <div class="options" id="music-options1">
+                <div class="option" data-answer="introspective">music that sounds like a late-night drive, introspection, and emotional tension</div>
+                <div class="option" data-answer="catchy">music that is catchy but says nothing beyond the moment</div>
+                <div class="option" data-answer="nothing">i don't think music says much about a person</div>
+            </div>
+            <div class="prompt" style="margin-top: 30px;">pick the line that feels most like your taste.</div>
+            <div class="options" id="music-options2">
+                <div class="option" data-answer="psychedelic">psychedelic, intimate, reflective, slightly lost but beautiful</div>
+                <div class="option" data-answer="loud">loud, disposable, random, just for background noise</div>
+                <div class="option" data-answer="silence">i don't care much about atmosphere or sonic identity</div>
+            </div>
+            <div class="prompt" style="margin-top: 30px;">choose the shared vibe that feels closest.</div>
+            <div class="options" id="music-options3">
+                <div class="option" data-answer="tame">tame impala, depth, texture, inner worlds</div>
+                <div class="option" data-answer="trending">whatever is trending, no attachment</div>
+                <div class="option" data-answer="silence">silence over music, always</div>
+            </div>
+            <div class="music-wave">〜〜〜</div>
+        </div>
+    </div>
+
+    <div class="modal" id="result-modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modal-title"></div>
+            <div class="modal-subtitle" id="modal-subtitle"></div>
+            <div class="modal-text" id="modal-text"></div>
+            <button class="restart-btn" onclick="restartQuiz()">start over</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSection = 1;
+        let answers = [];
+        let musicAnswers = [];
+
+        const sections = document.querySelectorAll('.section');
+        const progressFill = document.getElementById('progress-fill');
+        const modal = document.getElementById('result-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalSubtitle = document.getElementById('modal-subtitle');
+        const modalText = document.getElementById('modal-text');
+
+        const alignedAnswers = {
+            1: 'tragic misstep',
+            2: 'fear-control',
+            3: 'question-doubt',
+            4: 'nawal',
+            5: ['che', 'fidel'],
+            6: ['introspective', 'psychedelic', 'tame']
+        };
+
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('option')) {
+                selectOption(e.target);
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key >= '1' && e.key <= '3') {
+                const options = document.querySelectorAll('.section.active .option');
+                if (options[e.key - 1]) {
+                    selectOption(options[e.key - 1]);
+                }
+            }
+        });
+
+        function selectOption(option) {
+            const section = option.closest('.section');
+            const options = section.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+
+            const answer = option.dataset.answer;
+            if (currentSection === 6) {
+                musicAnswers.push(answer);
+                const musicOptions = section.querySelectorAll('.options');
+                let currentMusicSection = 0;
+                musicOptions.forEach((optGroup, index) => {
+                    if (optGroup.contains(option)) {
+                        currentMusicSection = index;
+                    }
+                });
+                if (currentMusicSection < 2) {
+                    setTimeout(() => {
+                        musicOptions[currentMusicSection].style.display = 'none';
+                        musicOptions[currentMusicSection + 1].style.display = 'flex';
+                    }, 500);
+                    return;
+                } else {
+                    answers.push(musicAnswers);
+                }
+            } else {
+                answers.push(answer);
+            }
+
+            setTimeout(() => {
+                nextSection();
+            }, 1000);
+        }
+
+        function nextSection() {
+            sections[currentSection - 1].classList.remove('active');
+            currentSection++;
+            if (currentSection <= 6) {
+                sections[currentSection - 1].classList.add('active');
+                updateProgress();
+            } else {
+                calculateResult();
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentSection - 1) / 6 * 100;
+            progressFill.style.width = progress + '%';
+        }
+
+        function calculateResult() {
+            let score = 0;
+            answers.forEach((answer, index) => {
+                const section = index + 1;
+                if (section === 6) {
+                    // Music scoring
+                    const alignedCount = answer.filter(ans => alignedAnswers[6].includes(ans)).length;
+                    if (alignedCount >= 2) score++;
+                } else if (Array.isArray(alignedAnswers[section])) {
+                    if (alignedAnswers[section].includes(answer)) score++;
+                } else {
+                    if (answer === alignedAnswers[section]) score++;
+                }
+            });
+
+            modal.classList.add(score >= 4 ? 'match' : '');
+            if (score >= 4) {
+                modalTitle.textContent = "it's a match";
+                modalSubtitle.textContent = "same frequency, different echoes.";
+                modalText.textContent = "late-night conversations approved.";
+            } else {
+                modalTitle.textContent = "interesting mind";
+                modalSubtitle.textContent = "not the same route, but still a road.";
+                modalText.textContent = "some distances are also a kind of meaning.";
+            }
+            modal.style.display = 'flex';
+        }
+
+        function restartQuiz() {
+            currentSection = 1;
+            answers = [];
+            musicAnswers = [];
+            sections.forEach(section => section.classList.remove('active'));
+            sections[0].classList.add('active');
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelectorAll('.options').forEach(opt => opt.style.display = 'flex');
+            progressFill.style.width = '0%';
+            modal.style.display = 'none';
+            modal.classList.remove('match');
+        }
+
+        updateProgress();
+    </script>
+</body>
+</html>
