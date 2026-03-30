@@ -423,68 +423,21 @@
             z-index: 150;
         }
 
-        .music-toggle {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(212, 165, 116, 0.15) 0%, rgba(184, 149, 111, 0.1) 100%);
-            border: 1.5px solid rgba(212, 165, 116, 0.3);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition-smooth);
-            color: var(--color-accent);
-            font-size: 1.2rem;
+        #music-btn {
+            background: rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
-            position: relative;
-            padding: 0;
-            font-family: inherit;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
         }
 
-        .music-toggle:hover {
-            background: linear-gradient(135deg, rgba(212, 165, 116, 0.25) 0%, rgba(184, 149, 111, 0.18) 100%);
-            border-color: rgba(212, 165, 116, 0.6);
-            transform: scale(1.05);
-        }
-
-        .music-toggle.playing {
-            background: linear-gradient(135deg, rgba(212, 165, 116, 0.25) 0%, rgba(184, 149, 111, 0.18) 100%);
-            border-color: var(--color-accent);
-        }
-
-        /* Visualizer dots when playing */
-        .visualizer {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .visualizer.active {
-            opacity: 1;
-        }
-
-        .visualizer-dot {
-            width: 2px;
-            height: 8px;
-            background: var(--color-accent);
-            border-radius: 1px;
-            animation: pulse 0.8s ease-in-out infinite;
-        }
-
-        .visualizer-dot:nth-child(1) { animation-delay: 0s; }
-        .visualizer-dot:nth-child(2) { animation-delay: 0.1s; }
-        .visualizer-dot:nth-child(3) { animation-delay: 0.2s; }
-
-        @keyframes pulse {
-            0%, 100% { height: 4px; opacity: 0.4; }
-            50% { height: 12px; opacity: 1; }
+        #music-btn:hover {
+            background: rgba(255,255,255,0.2);
         }
 
         audio {
@@ -586,18 +539,12 @@
     <header>
         <div class="header-logo">frequency</div>
         <div class="music-player">
-            <button class="music-toggle" id="music-toggle" title="Play background music" aria-label="Toggle music player">
-                <span id="music-icon">♪</span>
-                <div class="visualizer" id="visualizer">
-                    <div class="visualizer-dot"></div>
-                    <div class="visualizer-dot"></div>
-                    <div class="visualizer-dot"></div>
-                </div>
-            </button>
-            <audio id="audio-player" loop preload="metadata">
-                <source src="assets/doomsday.mp3" type="audio/mpeg">
+            <audio id="bg-music" loop preload="auto">
+                <source src="./assets/doomsday.mp3" type="audio/mpeg" />
                 Your browser does not support the audio element.
             </audio>
+
+            <button id="music-btn" type="button">Play Music</button>
         </div>
     </header>
 
@@ -908,103 +855,60 @@
         /* ============================================
            MUSIC PLAYER LOGIC
            ============================================ */
-        const musicPlayer = {
-            audioEl: document.getElementById('audio-player'),
-            toggleBtn: document.getElementById('music-toggle'),
-            musicIcon: document.getElementById('music-icon'),
-            visualizer: document.getElementById('visualizer'),
-            isPlaying: false,
-            audioReady: false,
+        const music = document.getElementById("bg-music");
+        const musicBtn = document.getElementById("music-btn");
 
-            init() {
-                if (!this.audioEl || !this.toggleBtn) {
-                    console.warn('Audio elements not found');
-                    return;
-                }
-                this.setupEventListeners();
-                this.checkAudioReady();
-                console.log('Music player initialized');
-            },
-
-            setupEventListeners() {
-                // Button click handler
-                this.toggleBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.toggle();
-                });
-                
-                // Audio event listeners
-                this.audioEl.addEventListener('play', () => this.onPlay());
-                this.audioEl.addEventListener('pause', () => this.onPause());
-                this.audioEl.addEventListener('error', (e) => this.onError(e));
-                this.audioEl.addEventListener('canplay', () => this.audioReady = true);
-            },
-
-            checkAudioReady() {
-                // Check if audio is already loaded
-                if (this.audioEl.readyState >= 2) {
-                    this.audioReady = true;
-                }
-            },
-
-            toggle() {
-                if (!this.audioEl) return;
-                
-                if (this.isPlaying) {
-                    this.audioEl.pause();
+        musicBtn.addEventListener("click", async () => {
+            try {
+                if (music.paused) {
+                    await music.play();
+                    musicBtn.textContent = "Play Music";
                 } else {
-                    // Check if file exists before trying to play
-                    const playPromise = this.audioEl.play();
-                    if (playPromise !== undefined) {
-                        playPromise.catch((error) => {
-                            console.error('Playback error:', error);
-                            this.onError(error);
-                        });
-                    }
+                    music.pause();
+                    musicBtn.textContent = "Play Music";
                 }
-            },
-
-            onPlay() {
-                this.isPlaying = true;
-                this.updateUI();
-            },
-
-            onPause() {
-                this.isPlaying = false;
-                this.updateUI();
-            },
-
-            onError(error) {
-                console.error('Audio error:', error);
-                this.isPlaying = false;
-                this.updateUI();
-                alert('Could not load audio file. Make sure assets/doomsday.mp3 exists.');
-            },
-
-            updateUI() {
-                // Update button state
-                this.toggleBtn.classList.toggle('playing', this.isPlaying);
-                this.visualizer.classList.toggle('active', this.isPlaying);
-                
-                if (this.isPlaying) {
-                    this.musicIcon.style.display = 'none';
-                    this.toggleBtn.setAttribute('title', 'Playing music – Click to pause');
-                } else {
-                    this.musicIcon.style.display = 'inline';
-                    this.visualizer.classList.remove('active');
-                    this.toggleBtn.setAttribute('title', 'Click to play music');
-                }
+            } catch (error) {
+                console.error("Audio play failed:", error);
+                alert("Could not play audio. Try clicking again.");
             }
-        };
+        });
+
+        music.addEventListener("error", () => {
+            console.error("Audio failed to load.");
+        });
 
         /* ============================================
            INITIALIZATION ON DOM LOAD
            ============================================ */
         document.addEventListener('DOMContentLoaded', () => {
             quizController.init();
-            musicPlayer.init();
+            
+            // Music player initialization
+            const music = document.getElementById("bg-music");
+            const musicBtn = document.getElementById("music-btn");
+
+            musicBtn.addEventListener("click", async () => {
+                try {
+                    if (music.paused) {
+                        await music.play();
+                        musicBtn.textContent = "Play Music";
+                    } else {
+                        music.pause();
+                        musicBtn.textContent = "Play Music";
+                    }
+                } catch (error) {
+                    console.error("Audio play failed:", error);
+                    alert("Could not play audio. Try clicking again.");
+                }
+            });
+
+            music.addEventListener("error", () => {
+                console.error("Audio failed to load.");
+            });
+            
             console.log('Application loaded');
         });
     </script>
 </body>
 </html>
+
